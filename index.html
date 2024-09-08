@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صفحة يوتيوبرز</title>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            direction: rtl;
+            background-color: #333;
+            color: white;
+        }
+
+        header {
+            background-color: #444;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .main-content {
+            padding: 2rem;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .id-container {
+            background-color: #222;
+            border-radius: 20px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #555;
+        }
+
+        .id-container img {
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            margin-right: 1rem;
+        }
+
+        .id-container button {
+            padding: 0.5rem 1rem;
+            margin-left: 0.5rem;
+            border: none;
+            background-color: #9000ff;
+            color: white;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .id-container button:hover {
+            background-color: #7200cc;
+            transform: scale(1.05);
+        }
+
+        .search-bar {
+            margin-bottom: 1rem;
+        }
+
+        .search-bar input {
+            padding: 0.5rem;
+            width: 100%;
+            border-radius: 5px;
+            border: 1px solid #555;
+            background-color: #222;
+            color: white;
+        }
+
+        .search-bar button {
+            padding: 0.5rem;
+            border: none;
+            background-color: #9000ff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .search-bar button:hover {
+            background-color: #7200cc;
+        }
+
+        .add-button {
+            display: block;
+            text-align: center;
+            margin-top: 2rem;
+            padding: 0.5rem 1rem;
+            border: none;
+            background-color: #9000ff;
+            color: white;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .add-button:hover {
+            background-color: #7200cc;
+            transform: scale(1.05);
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>معرفات اليوتيوبرز</h1>
+    </header>
+    
+    <div class="main-content">
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="ابحث عن اسم اليوتيوبر..." oninput="search()">
+        </div>
+        
+        <div id="ids">
+            <!-- سيتم تحميل المحتوى هنا باستخدام JavaScript -->
+        </div>
+        
+        <a href="add-id.html" class="add-button">إضافة معرف جديد</a>
+    </div>
+
+    <script>
+        function displayChannels() {
+            const container = document.getElementById('ids');
+            container.innerHTML = ''; // Clear the existing content
+
+            const channels = JSON.parse(localStorage.getItem('youtubeChannels')) || [];
+
+            channels.forEach((channel, index) => {
+                const idContainer = document.createElement('div');
+                idContainer.className = 'id-container';
+
+                idContainer.innerHTML = `
+                    <span>${channel.name}: <span>${channel.id}</span></span>
+                    <img src="${channel.image}" alt="${channel.name}">
+                    <div>
+                        <button onclick="copyId('${channel.id}')">نسخ</button>
+                        <button onclick="window.open('${channel.url}', '_blank')">انتقل للقناة</button>
+                        <button onclick="removeChannel(${index})">حذف</button>
+                    </div>
+                `;
+
+                container.appendChild(idContainer);
+            });
+        }
+
+        function copyId(id) {
+            navigator.clipboard.writeText(id).then(() => {
+                alert(`تم نسخ ${id}`);
+            }).catch(err => {
+                console.error('فشل النسخ: ', err);
+            });
+        }
+
+        function removeChannel(index) {
+            let channels = JSON.parse(localStorage.getItem('youtubeChannels')) || [];
+            channels.splice(index, 1);
+            localStorage.setItem('youtubeChannels', JSON.stringify(channels));
+            displayChannels(); // Refresh the list
+        }
+
+        function search() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const ids = document.querySelectorAll('.id-container');
+            ids.forEach(id => {
+                const name = id.querySelector('span').innerText.toLowerCase();
+                if (name.includes(query)) {
+                    id.style.display = '';
+                } else {
+                    id.style.display = 'none';
+                }
+            });
+        }
+
+        window.onload = displayChannels;
+    </script>
+</body>
+</html>
+
